@@ -1,6 +1,6 @@
 # Runner 🏃
 
-An arbitrageur for Numo Engine to keep the discount factors in check with real world forex markets.
+A bot that keeps the discount factors of Numo Engines (e.g. USDT/fyUSDT pools) in check with real world FX markets using a fixed income arbitrage strategy.
 
 ## Build
 
