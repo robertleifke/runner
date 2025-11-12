@@ -1,29 +1,46 @@
-# Runner 🏃
+# Runner 🏃‍♂️
 
-A bot that keeps the discount factors of Numo Engines (e.g. USDT/fyUSDT pools) in check with real world FX markets using a fixed income arbitrage strategy.
+A bot that keeps the discount factors of **Numo Engines** (e.g. `USDT/fyUSDT` pools) aligned with real-world FX markets using a fixed-income arbitrage strategy.
+
+## Overview
+
+### Collector (per block)
+
+**Goal:** Batch-read all Engine pools via multicall, then compute the marginal price:
+
+### Strategy
+
+1. **Gets target discount factor**  
+   Computes discount factor from SOFR curve or analogous STIR benchmark if not a USD pool. 
+
+2. **Compares implied discount factors**  
+   Compares the pool implied discount factor
+
+3. **Solves for optimal trade size**  
+   Determines the trade size such that the **post-trade marginal price** equals the discount factor.
+
+4. **Emits arbitrage action**  
+   Triggers the Router contract to execute both legs atomically:
+   - **Buy ZCB on cheap pool / Sell ZCB on rich pool**, or  
+   - **Single pool mint/sell loop** (if applicable).
+
+
+###  Executor
+
+Submit a single transaction on [Celo](https://celoscan.io/):
+- **Include slippage guards.**  
+- **Retry** with a fee bump if not included within *N* blocks.
 
 ## Build
 
-First, make sure the following are installed: 
-1. [Anvil](https://github.com/foundry-rs/foundry/tree/master/crates/anvil#installing-from-source)
+Before running, make sure the following are installed:
 
-In order to build, first clone the github repo: 
-
-```sh
-git clone https://github.com/paradigmxyz/artemis
-cd artemis
+```bash
+npm install
+forge build
 ```
 
-Next, run tests with cargo: 
+## Run
 
-```sh
-cargo test --all
-```
+forge script Runner.s.sol --rpc-url $RPC_URL --broadcast
 
-In order to run the opensea sudoswap arbitrage strategy, you can run the following command: 
-
-```sh
-cargo run -- --wss <INFURA_OR_ALCHEMY_KEY> --opensea-api-key <OPENSEA_API_KEY> --private-key <PRIVATE_KEY> --arb-contract-address <ARB_CONTRACT_ADDRESS> --bid-percentage <BID_PERCENTAGE>
-```
-
-where `ARB_CONTRACT_ADDRESS` is the address to which you deploy the [arb contract](/crates/strategies/opensea-sudo-arb/contracts/src/SudoOpenseaArb.sol).
