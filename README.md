@@ -1,4 +1,6 @@
-# MEV bot for Numo Engine
+# Runner 🏃
+
+An arbitrageur for Numo Engine to keep the discount factors in check with real world forex markets.
 
 ## Build
 
